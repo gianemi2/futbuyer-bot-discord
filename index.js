@@ -1,13 +1,14 @@
 const fs = require('fs');
 const Discord = require('discord.js');
-const { prefix, token } = require('./config.json');
+require('dotenv').config()
+
+const { PREFIX, TOKEN } = process.env;
 const cron = require('cron')
 const getLastYearSBC = require('./cronjob/getLastYearSBC.js')
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 const cooldowns = new Discord.Collection();
-
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const sendLastYearSBC = new cron.CronJob('0 0 * * 0', () => {
@@ -38,9 +39,9 @@ client.on('ready', () => {
 })
 
 client.on('message', message => {
-    if (!message.content.startsWith(prefix) || message.author.bot) return;
+    if (!message.content.startsWith(PREFIX) || message.author.bot) return;
 
-    const args = message.content.slice(prefix.length).trim().split(/ +/);
+    const args = message.content.slice(PREFIX.length).trim().split(/ +/);
     const commandName = args.shift().toLowerCase();
 
     const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
@@ -49,7 +50,7 @@ client.on('message', message => {
     if (command.args && !args.length) {
         let reply = `Non hai passato alcun valore, ${message.author}!`;
         if (command.usage) {
-            reply = `${reply}\n il comando dovrebbe essere qualcosa tipo: \n *${prefix}${command.name} ${command.usage}*`
+            reply = `${reply}\n il comando dovrebbe essere qualcosa tipo: \n *${PREFIX}${command.name} ${command.usage}*`
         }
         return message.channel.send(reply);
     }
@@ -80,5 +81,4 @@ client.on('message', message => {
         message.reply(error.message);
     }
 });
-
-client.login(token)
+client.login(TOKEN)

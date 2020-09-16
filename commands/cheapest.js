@@ -1,6 +1,7 @@
+require('dotenv').config()
 
+const { HELPERURL } = process.env;
 const fetch = require('node-fetch')
-const { futbinHelper } = require('../config.json')
 
 module.exports = {
     name: 'cheapest',
@@ -14,7 +15,7 @@ module.exports = {
         const askedRating = parseInt(args[0])
         if (askedRating < 81 || askedRating > 98) throw new Error('Il rating deve essere compreso tra 81 e 98');
 
-        const response = fetch(`${futbinHelper}/v1/cheapestPlayers`).then(res => res.json())
+        const response = fetch(`${HELPERURL}/v1/cheapestPlayers`).then(res => res.json())
         message.channel.send('Carico...');
         response.then(result => {
             const { success, data } = result
