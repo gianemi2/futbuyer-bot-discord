@@ -5,12 +5,17 @@ require('dotenv').config()
 const { PREFIX, TOKEN } = process.env;
 const cron = require('cron')
 const getLastYearSBC = require('./cronjob/getLastYearSBC.js')
+const ping = require('./cronjob/ping')
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 const cooldowns = new Discord.Collection();
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+
+const pingGlitch = new cron.CronJob('* * * * *', ping)
+pingGlitch.start()
+
 const sendLastYearSBC = new cron.CronJob('0 0 * * 0', () => {
     getLastYearSBC()
         .then(res => {

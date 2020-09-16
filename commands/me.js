@@ -6,6 +6,6 @@ module.exports = {
     aliases: ['io', 'chisono'],
     cooldown: 10,
     execute(message, args) {
-        message.reply(`Il tuo nome è **${message.author.username}#${message.author.discriminator}** e il tuo id è: **${message.author.id}**`)
+        message.reply(`Fra ti chiami **${message.author.username}#${message.author.discriminator}**, che ti sei fatto? Il tuo id è: **${message.author.id}**. Bella seguimi su Spotify!`)
     }
 };
