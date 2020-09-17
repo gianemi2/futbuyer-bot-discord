@@ -7,6 +7,18 @@ const cron = require('cron')
 const getLastYearSBC = require('./cronjob/getLastYearSBC.js')
 const ping = require('./cronjob/ping')
 
+const express = require('express')
+const app = express()
+const port = 5001
+
+app.get('/', (req, res) => {
+    res.send('🎵 POTEVO ESSERE UN TOSSICO MORTO E INVECE SONO UN TOSSICO RICCO')
+})
+
+app.listen(port, () => {
+    console.log(`Example app listening at http://localhost:${port}`)
+})
+
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 const cooldowns = new Discord.Collection();
