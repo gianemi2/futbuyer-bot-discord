@@ -9,7 +9,7 @@ const ping = require('./cronjob/ping')
 
 const express = require('express')
 const app = express()
-const port = 5001
+const port = process.env.PORT || 5000
 
 app.get('/', (req, res) => {
     res.send('🎵 POTEVO ESSERE UN TOSSICO MORTO E INVECE SONO UN TOSSICO RICCO')
