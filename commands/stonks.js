@@ -1,7 +1,7 @@
 const { MessageEmbed } = require('discord.js')
 module.exports = {
     name: 'stonks',
-    description: 'Mostra i guadagni più alti fatti con il bot',
+    description: 'Mostra i guadagni più alti fatti con il bot!',
     args: false,
     usage: '',
     aliases: [],
