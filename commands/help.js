@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { PREFIX } = process.env
+const { CMDPREFIX } = process.env
 
 module.exports = {
     name: 'help',
@@ -13,8 +13,8 @@ module.exports = {
 
         if (!args.length) {
             data.push('Here\'s a list of all my commands:');
-            data.push(commands.map(command => command.name).join(', '));
-            data.push(`\nYou can send \`${PREFIX}help [command name]\` to get info on a specific command!`);
+            data.push(commands.map(command => `\`${command.name}\``).join('\n'));
+            data.push(`\nYou can send \`${CMDPREFIX}help [command name]\` to get info on a specific command!`);
 
             return message.channel.send(data, { split: true })
                 .then(() => {
