@@ -2,7 +2,7 @@ const fs = require('fs');
 const Discord = require('discord.js');
 require('dotenv').config()
 
-const { PREFIX, TOKEN } = process.env;
+const { CMDPREFIX, TOKEN } = process.env;
 const cron = require('cron')
 const getLastYearSBC = require('./cronjob/getLastYearSBC.js')
 const ping = require('./cronjob/ping')
@@ -56,9 +56,8 @@ client.on('ready', () => {
 })
 
 client.on('message', message => {
-    if (!message.content.startsWith(PREFIX) || message.author.bot) return;
-
-    const args = message.content.slice(PREFIX.length).trim().split(/ +/);
+    if (!message.content.startsWith(CMDPREFIX) || message.author.bot) return;
+    const args = message.content.slice(CMDPREFIX.length).trim().split(/ +/);
     const commandName = args.shift().toLowerCase();
 
     const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
@@ -67,7 +66,7 @@ client.on('message', message => {
     if (command.args && !args.length) {
         let reply = `Non hai passato alcun valore, ${message.author}!`;
         if (command.usage) {
-            reply = `${reply}\n il comando dovrebbe essere qualcosa tipo: \n *${PREFIX}${command.name} ${command.usage}*`
+            reply = `${reply}\n il comando dovrebbe essere qualcosa tipo: \n *${CMDPREFIX}${command.name} ${command.usage}*`
         }
         return message.channel.send(reply);
     }
