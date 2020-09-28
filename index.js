@@ -12,27 +12,29 @@ const ping = require('./cronjob/ping')
 const express = require('express')
 const app = express()
 app.use(cors());
+app.use(express.json());
+
 const port = process.env.PORT || 5000
 
-app.get('/woofut/pending', (req, res) => {
-    console.log('pending');
-    res.json({ status: 'ok' })
+app.post('/woofut/pending', (req, res) => {
+    console.log('pending')
+    res.json(req.body)
 })
-app.get('/woofut/active', (req, res) => {
+app.post('/woofut/active', (req, res) => {
     console.log('active');
-    res.json({ status: 'ok' })
+    res.json(req.body)
 })
-app.get('/woofut/pending-cancel', (req, res) => {
+app.post('/woofut/pending-cancel', (req, res) => {
     console.log('pending-cancel');
-    res.json({ status: 'ok' })
+    res.json(req.body)
 })
-app.get('/woofut/on-hold', (req, res) => {
+app.post('/woofut/on-hold', (req, res) => {
     console.log('on-hold');
-    res.json({ status: 'ok' })
+    res.json(req.body)
 })
-app.get('/woofut/cancelled', (req, res) => {
+app.post('/woofut/cancelled', (req, res) => {
     console.log('cancelled');
-    res.json({ status: 'ok' })
+    res.json(req.body)
 })
 
 app.get('/', (req, res) => {
