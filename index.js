@@ -1,5 +1,7 @@
 const fs = require('fs');
 const Discord = require('discord.js');
+var cors = require('cors');
+
 require('dotenv').config()
 
 const { CMDPREFIX, TOKEN } = process.env;
@@ -9,7 +11,29 @@ const ping = require('./cronjob/ping')
 
 const express = require('express')
 const app = express()
+app.use(cors());
 const port = process.env.PORT || 5000
+
+app.get('/woofut/pending', (req, res) => {
+    console.log('pending');
+    res.json({ status: 'ok' })
+})
+app.get('/woofut/active', (req, res) => {
+    console.log('active');
+    res.json({ status: 'ok' })
+})
+app.get('/woofut/pending-cancel', (req, res) => {
+    console.log('pending-cancel');
+    res.json({ status: 'ok' })
+})
+app.get('/woofut/on-hold', (req, res) => {
+    console.log('on-hold');
+    res.json({ status: 'ok' })
+})
+app.get('/woofut/cancelled', (req, res) => {
+    console.log('cancelled');
+    res.json({ status: 'ok' })
+})
 
 app.get('/', (req, res) => {
     res.send('🎵 POTEVO ESSERE UN TOSSICO MORTO E INVECE SONO UN TOSSICO RICCO!')
