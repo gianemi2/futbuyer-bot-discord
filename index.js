@@ -40,9 +40,7 @@ const sendLastYearSBC = new cron.CronJob('0 0 * * 0', () => {
 sendLastYearSBC.start()
 
 app.get('/google', (req, res) => {
-    open(generateToken)
-        .then(res => console.log(res))
-        .catch(err => console.log(err))
+    console.log(generateToken)
 })
 
 app.get('/google/oauth2callback', (req, res) => {
