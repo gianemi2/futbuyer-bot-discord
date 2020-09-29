@@ -1,6 +1,7 @@
 const fs = require('fs');
 const Discord = require('discord.js');
-var cors = require('cors');
+const open = require('open')
+const cors = require('cors');
 
 require('dotenv').config()
 
@@ -8,6 +9,8 @@ const { CMDPREFIX, TOKEN } = process.env;
 const cron = require('cron')
 const getLastYearSBC = require('./cronjob/getLastYearSBC.js')
 const ping = require('./cronjob/ping')
+
+const { generateToken, createUserInGroups } = require('./api/google')
 
 const express = require('express')
 const app = express()
@@ -36,6 +39,15 @@ const sendLastYearSBC = new cron.CronJob('0 0 * * 0', () => {
 })
 sendLastYearSBC.start()
 
+app.get('/google', (req, res) => {
+    open(generateToken)
+        .then(res => console.log(res))
+        .catch(err => console.log(err))
+})
+
+app.get('/google/oauth2callback', (req, res) => {
+    res.json(req.query)
+})
 
 app.post('/woofut/pending', (req, res) => {
     const { id } = req.body
@@ -43,13 +55,15 @@ app.post('/woofut/pending', (req, res) => {
     res.json(req.body)
 })
 app.post('/woofut/active', async (req, res) => {
-    const { id } = req.body
+    const { id, gmail } = req.body
     sendPM(id, 'Il tuo bot è attivo. Buon divertimento.')
     const userRoles = await getUserRoles('476684926788435969');
     const { futureStars, bronzini } = await getActionsRoles();
 
     userRoles.add(futureStars);
     userRoles.remove(bronzini);
+    const googleResponse = await createUserInGroups(gmail);
+    console.log(googleResponse)
     res.json(req.body)
 })
 app.post('/woofut/pending-cancel', (req, res) => {
