@@ -141,6 +141,7 @@ client.on('message', message => {
 client.login(TOKEN)
 
 const sendPM = async (userID, PM) => {
+    console.log(userID);
     try {
         const user = await getUser(userID);
         const dmChannel = await user.createDM();
