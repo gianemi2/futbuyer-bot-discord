@@ -185,6 +185,7 @@ const handleDefaultDiscordError = (error) => {
         case 10013:
             return message = `Errore. Utente non trovato. Utente: ${userID}`
         default:
+            return error.message;
             break;
     }
 }
