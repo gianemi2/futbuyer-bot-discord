@@ -10,7 +10,7 @@ const cron = require('cron')
 const getLastYearSBC = require('./cronjob/getLastYearSBC.js')
 const ping = require('./cronjob/ping')
 
-const { generateToken, createUserInGroups } = require('./api/google')
+const { generatgeToken, createUserInGroups } = require('./api/google')
 
 const express = require('express')
 const app = express()
@@ -85,8 +85,8 @@ app.post('/woofut/cancelled', async (req, res) => {
     res.json(req.body)
 })
 app.get('/', async (req, res) => {
-    res.send('ok');
-    //res.send('🎵 POTEVO ESSERE UN TOSSICO MORTO E INVECE SONO UN TOSSICO RICCO!')
+    //res.send('ok');
+    res.send('🎵 POTEVO ESSERE UN TOSSICO MORTO E INVECE SONO UN TOSSICO RICCO!')
 })
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
