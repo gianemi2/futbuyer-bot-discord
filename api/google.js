@@ -34,11 +34,22 @@ const createUserInGroups = async (email) => {
         body: JSON.stringify({ email })
     })
     const json = await response.json();
-    console.log(json);
+    return json;
+}
+
+const removeUserFromGroup = async (email) => {
+    const response = await fetch(`https://www.googleapis.com/admin/directory/v1/groups/${GROUPKEY}/members/${email}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${GOOGLE_ACCESS_TOKEN}`
+        }
+    })
+    const json = await response.json();
     return json;
 }
 
 module.exports = {
     generateToken: oauth2Client.generateAuthUrl({ scope: scopes }),
-    createUserInGroups
+    createUserInGroups,
+    removeUserFromGroup
 }

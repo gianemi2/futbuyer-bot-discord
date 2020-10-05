@@ -10,7 +10,7 @@ const cron = require('cron')
 const getLastYearSBC = require('./cronjob/getLastYearSBC.js')
 const ping = require('./cronjob/ping')
 
-const { generatgeToken, createUserInGroups } = require('./api/google')
+const { generateToken, createUserInGroups, removeUserFromGroup } = require('./api/google')
 
 const express = require('express')
 const app = express()
@@ -66,7 +66,7 @@ app.post('/woofut/active', async (req, res) => {
 })
 app.post('/woofut/pending-cancel', (req, res) => {
     const { id } = req.body
-    sendPM(id, 'Ci dispiace molto vedere che te ne stai andando... È stato un piacere averti con noi. Abbi cura di te! Ricorda se vuoi tornare non devi far altro che tornare su SITO_WEB_LINK e creare un nuovo abbonamento.')
+    sendPM(id, 'Ci dispiace molto vedere che te ne stai andando... È stato un piacere averti con noi. Abbi cura di te! Ricorda se vuoi tornare non devi far altro che tornare su https://futbuyer.it e creare un nuovo abbonamento.')
     res.json(req.body)
 })
 app.post('/woofut/on-hold', (req, res) => {
@@ -75,13 +75,16 @@ app.post('/woofut/on-hold', (req, res) => {
     res.json(req.body)
 })
 app.post('/woofut/cancelled', async (req, res) => {
-    const { id } = req.body
+    const { id, gmail } = req.body
     const userRoles = await getUserRoles(id);
     const { futureStars, bronzini } = await getActionsRoles();
 
-    sendPM(id, 'Ti confermiamo la cancellazione del bot FUTBUYER. Probabilmente il bot era scaduto da più di 3 giorni oppure hai deciso te di cancellarlo. Se vuoi riattivare la sottoscrizione procedi al rinnovo su SITO_WEB_LINK. ')
+    sendPM(id, 'Ti confermiamo la cancellazione del bot FUTBUYER. Probabilmente il bot era scaduto da più di 3 giorni oppure hai deciso te di cancellarlo. Se vuoi riattivare la sottoscrizione procedi al rinnovo su https://futbuyer.it ')
     userRoles.add(bronzini);
     userRoles.remove(futureStars);
+
+    const googleResponse = await removeUserFromGroup(gmail)
+    console.log(googleResponse)
     res.json(req.body)
 })
 app.get('/', async (req, res) => {
