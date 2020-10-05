@@ -55,11 +55,17 @@ app.post('/woofut/pending', (req, res) => {
 app.post('/woofut/active', async (req, res) => {
     const { id, gmail } = req.body
     sendPM(id, 'Il tuo bot è attivo. Buon divertimento.')
-    const userRoles = await getUserRoles('476684926788435969');
+    const userRoles = await getUserRoles(id);
     const { futureStars, bronzini } = await getActionsRoles();
 
-    userRoles.add(futureStars);
-    userRoles.remove(bronzini);
+    let isAlreadyFutureStar = false
+    userRoles.cache.forEach((role) => {
+        isAlreadyFutureStar = role.name === 'FUTURE STARS' ? true : false
+    })
+    if (!isAlreadyFutureStar) {
+        userRoles.add(futureStars);
+        userRoles.remove(bronzini);
+    }
     const googleResponse = await createUserInGroups(gmail);
     console.log(googleResponse)
     res.json(req.body)
@@ -156,13 +162,12 @@ client.on('message', message => {
 client.login(TOKEN)
 
 const sendPM = async (userID, PM) => {
-    console.log(userID);
     try {
         const user = await getUser(userID);
         const dmChannel = await user.createDM();
         dmChannel.send(PM);
     } catch (error) {
-        console.log(handleDefaultDiscordError(error));
+        console.error(handleDefaultDiscordError(error));
     }
 }
 
@@ -171,7 +176,7 @@ const getUserRoles = async (userID) => {
         const user = await getUser(userID);
         return user.roles;
     } catch (error) {
-        console.log(handleDefaultDiscordError(error));
+        console.error(handleDefaultDiscordError(error));
     }
 }
 
@@ -189,7 +194,7 @@ const getUser = async (userID) => {
         const user = await server.members.fetch(userID)
         return user;
     } catch (error) {
-        console.log(handleDefaultDiscordError(error));
+        console.error(handleDefaultDiscordError(error));
     }
 }
 
