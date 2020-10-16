@@ -9,6 +9,7 @@ const { CMDPREFIX, TOKEN } = process.env;
 const cron = require('cron')
 const getLastYearSBC = require('./cronjob/getLastYearSBC.js')
 const ping = require('./cronjob/ping')
+const { getMostUsedPlayers } = require('./api/futbin')
 
 const { generateToken, createUserInGroups, removeUserFromGroup } = require('./api/google')
 
@@ -93,8 +94,15 @@ app.post('/woofut/cancelled', async (req, res) => {
     console.log(googleResponse)
     res.json(req.body)
 })
+app.get('/v1/mostUsedPlayers', async (req, res) => {
+    const { sbc } = req.query
+    const players = await getMostUsedPlayers(sbc)
+
+    res.json(players)
+})
 app.get('/', async (req, res) => {
     //res.send('ok');
+    getMostUsedPlayers('s')
     res.send('🎵 POTEVO ESSERE UN TOSSICO MORTO E INVECE SONO UN TOSSICO RICCO!')
 })
 app.listen(port, () => {
@@ -159,7 +167,7 @@ client.on('message', message => {
         message.reply(error.message);
     }
 });
-client.login(TOKEN)
+//client.login(TOKEN)
 
 const sendPM = async (userID, PM) => {
     try {

@@ -7,7 +7,7 @@ module.exports = {
     aliases: [],
     cooldown: 1,
     async execute(message, args) {
-        const stonksChannel = message.guild.channels.cache.find(channel => channel.name === '💎stonks');
+        const stonksChannel = message.guild.channels.cache.find(channel => channel.name === '👑stonks');
         const msgs = await stonksChannel.messages.fetch({ limit: 100 })
 
         const highest = msgs.reduce((prevMsg, currMsg) => prevMsg.content > currMsg.content ? prevMsg : currMsg, { content: 0 })
