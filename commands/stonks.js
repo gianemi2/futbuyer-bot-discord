@@ -10,8 +10,7 @@ module.exports = {
         const stonksChannel = message.guild.channels.cache.find(channel => channel.name === '👑stonks');
         const msgs = await stonksChannel.messages.fetch({ limit: 100 })
 
-        const highest = msgs.reduce((prevMsg, currMsg) => prevMsg.content > currMsg.content ? prevMsg : currMsg, { content: 0 })
-
+        const highest = msgs.reduce((prevMsg, currMsg) => parseInt(prevMsg.content) > parseInt(currMsg.content) ? prevMsg : currMsg, { content: 0 })
         const embed = new MessageEmbed()
             .setColor('#00B5FF')
             .setTitle('Più grande guadagno fino ad ora')
