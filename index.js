@@ -167,7 +167,7 @@ client.on('message', message => {
         message.reply(error.message);
     }
 });
-//client.login(TOKEN)
+client.login(TOKEN)
 
 const sendPM = async (userID, PM) => {
     try {
