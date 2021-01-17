@@ -11,9 +11,8 @@ const getLastYearSBC = require('./cronjob/getLastYearSBC.js')
 const ping = require('./cronjob/ping')
 const { getMostUsedPlayers } = require('./api/futbin')
 
-const { generateToken, createUserInGroups, removeUserFromGroup } = require('./api/google')
-
-const express = require('express')
+const express = require('express');
+const { clouddebugger } = require('googleapis/build/src/apis/clouddebugger');
 const app = express()
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
@@ -28,7 +27,7 @@ const serverID = '748464440340512859';
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
 const pingGlitch = new cron.CronJob('* * * * *', ping)
-pingGlitch.start()
+//pingGlitch.start()
 
 const sendLastYearSBC = new cron.CronJob('0 0 * * 0', () => {
     getLastYearSBC()
@@ -39,14 +38,6 @@ const sendLastYearSBC = new cron.CronJob('0 0 * * 0', () => {
         })
 })
 sendLastYearSBC.start()
-
-app.get('/google', (req, res) => {
-    console.log(generateToken)
-})
-
-app.get('/google/oauth2callback', (req, res) => {
-    res.json(req.query)
-})
 
 app.post('/woofut/pending', (req, res) => {
     const { id } = req.body
@@ -67,8 +58,6 @@ app.post('/woofut/active', async (req, res) => {
         userRoles.add(futureStars);
         userRoles.remove(bronzini);
     }
-    const googleResponse = await createUserInGroups(gmail);
-    console.log(googleResponse)
     res.json(req.body)
 })
 app.post('/woofut/pending-cancel', (req, res) => {
@@ -90,8 +79,6 @@ app.post('/woofut/cancelled', async (req, res) => {
     userRoles.add(bronzini);
     userRoles.remove(futureStars);
 
-    const googleResponse = await removeUserFromGroup(gmail)
-    console.log(googleResponse)
     res.json(req.body)
 })
 app.get('/v1/mostUsedPlayers', async (req, res) => {
@@ -102,9 +89,15 @@ app.get('/v1/mostUsedPlayers', async (req, res) => {
 })
 app.get('/', async (req, res) => {
     //res.send('ok');
-    getMostUsedPlayers('s')
     res.send('🎵 POTEVO ESSERE UN TOSSICO MORTO E INVECE SONO UN TOSSICO RICCO!')
 })
+
+app.get('/v1/notifyCaptcha', async (req, res) => {
+    const {id} = req.query;
+    const data = await sendPM(id, 'Hai preso un captcha!');
+    res.send('ok');
+})
+
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
 })
@@ -116,6 +109,7 @@ for (const file of commandFiles) {
 }
 
 client.on('ready', () => {
+    console.log('KETY FS1');
     const today = new Date().getDay()
     const playing = today >= 5 || today == 0 ? 'Weekend League' : 'Division Rivals'
     client.user.setPresence({
@@ -170,6 +164,8 @@ client.on('message', message => {
 client.login(TOKEN)
 
 const sendPM = async (userID, PM) => {
+    console.log(userID);
+    console.log(PM);
     try {
         const user = await getUser(userID);
         const dmChannel = await user.createDM();
@@ -199,6 +195,7 @@ const getActionsRoles = async () => {
 const getUser = async (userID) => {
     try {
         const server = await client.guilds.fetch(serverID);
+        server.members.fetch(userID).then(res => console.log(res)).catch(err => console.log(err));
         const user = await server.members.fetch(userID)
         return user;
     } catch (error) {
