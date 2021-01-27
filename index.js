@@ -7,12 +7,10 @@ require('dotenv').config()
 
 const { CMDPREFIX, TOKEN } = process.env;
 const cron = require('cron')
-const getLastYearSBC = require('./cronjob/getLastYearSBC.js')
 const ping = require('./cronjob/ping')
 const { getMostUsedPlayers } = require('./api/futbin')
 
-const express = require('express');
-const { clouddebugger } = require('googleapis/build/src/apis/clouddebugger');
+const express = require('express')
 const app = express()
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
@@ -27,17 +25,7 @@ const serverID = '748464440340512859';
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
 const pingGlitch = new cron.CronJob('* * * * *', ping)
-//pingGlitch.start()
-
-const sendLastYearSBC = new cron.CronJob('0 0 * * 0', () => {
-    getLastYearSBC()
-        .then(res => {
-            const channel = client.channels.cache.find(channel => channel.id === '755454500558340218')
-            const message = res.future.reduce((prev, curr) => `${prev}\n ${curr.title}`, '')
-            channel.send(message)
-        })
-})
-sendLastYearSBC.start()
+pingGlitch.start()
 
 app.post('/woofut/pending', (req, res) => {
     const { id } = req.body
@@ -46,7 +34,6 @@ app.post('/woofut/pending', (req, res) => {
 })
 app.post('/woofut/active', async (req, res) => {
     const { id, gmail } = req.body
-    sendPM(id, 'Il tuo bot è attivo. Buon divertimento.')
     const userRoles = await getUserRoles(id);
     const { futureStars, bronzini } = await getActionsRoles();
 
@@ -57,6 +44,7 @@ app.post('/woofut/active', async (req, res) => {
     if (!isAlreadyFutureStar) {
         userRoles.add(futureStars);
         userRoles.remove(bronzini);
+        sendPM(id, 'Il tuo bot è attivo. Buon divertimento.')
     }
     res.json(req.body)
 })
@@ -81,6 +69,18 @@ app.post('/woofut/cancelled', async (req, res) => {
 
     res.json(req.body)
 })
+app.get('/v1/notifyCaptcha', async (req, res) => {
+    const { id, title, message } = req.query
+    try {
+        const pm = await sendPM(id, title + message);
+        res.json({ success: true })
+    } catch (error) {
+        console.error('SEND MESSAGE ERROR!')
+        console.error(error)
+        res.json({ success: false, message: error.message, code: error.code })
+    }
+})
+
 app.get('/v1/mostUsedPlayers', async (req, res) => {
     const { sbc } = req.query
     const players = await getMostUsedPlayers(sbc)
@@ -89,15 +89,9 @@ app.get('/v1/mostUsedPlayers', async (req, res) => {
 })
 app.get('/', async (req, res) => {
     //res.send('ok');
+    getMostUsedPlayers('s')
     res.send('🎵 POTEVO ESSERE UN TOSSICO MORTO E INVECE SONO UN TOSSICO RICCO!')
 })
-
-app.get('/v1/notifyCaptcha', async (req, res) => {
-    const {id} = req.query;
-    const data = await sendPM(id, 'Hai preso un captcha!');
-    res.send('ok');
-})
-
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
 })
@@ -109,7 +103,6 @@ for (const file of commandFiles) {
 }
 
 client.on('ready', () => {
-    console.log('KETY FS1');
     const today = new Date().getDay()
     const playing = today >= 5 || today == 0 ? 'Weekend League' : 'Division Rivals'
     client.user.setPresence({
@@ -117,6 +110,7 @@ client.on('ready', () => {
             name: playing
         }
     })
+    console.log('KETY LOGGED IN!')
 })
 
 client.on('message', message => {
@@ -164,14 +158,13 @@ client.on('message', message => {
 client.login(TOKEN)
 
 const sendPM = async (userID, PM) => {
-    console.log(userID);
-    console.log(PM);
     try {
         const user = await getUser(userID);
         const dmChannel = await user.createDM();
-        dmChannel.send(PM);
+        const sent = await dmChannel.send(PM);
     } catch (error) {
-        console.error(handleDefaultDiscordError(error));
+        const handledError = handleDefaultDiscordError(error)
+        throw { message: handledError, code: error.code }
     }
 }
 
@@ -195,7 +188,6 @@ const getActionsRoles = async () => {
 const getUser = async (userID) => {
     try {
         const server = await client.guilds.fetch(serverID);
-        server.members.fetch(userID).then(res => console.log(res)).catch(err => console.log(err));
         const user = await server.members.fetch(userID)
         return user;
     } catch (error) {
@@ -210,8 +202,14 @@ const handleDefaultDiscordError = (error) => {
             return message = `Errore. Server non trovato oppure il bot non ha accesso. Server ID: ${serverID}`
         case 10013:
             return message = `Errore. Utente non trovato. Utente: ${userID}`
+        case 50007:
+            return message = `Non è stato possibile inviare il messaggio. Controlla di aver abilitato i messaggi privati su Discord. `
         default:
             return error.message;
             break;
     }
 }
+
+process.on('uncaughtException', function (err) {
+    console.log(err);
+}); 
