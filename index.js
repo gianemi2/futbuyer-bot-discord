@@ -70,9 +70,9 @@ app.post('/woofut/cancelled', async (req, res) => {
     res.json(req.body)
 })
 app.get('/v1/notifyCaptcha', async (req, res) => {
-    const { id, title, message } = req.query
+    const { id } = req.query
     try {
-        const pm = await sendPM(id, title + message);
+        const pm = await sendPM(id, 'Hai preso un captcha :(');
         res.json({ success: true })
     } catch (error) {
         console.error('SEND MESSAGE ERROR!')
@@ -87,11 +87,11 @@ app.get('/v1/mostUsedPlayers', async (req, res) => {
 
     res.json(players)
 })
+
 app.get('/', async (req, res) => {
-    //res.send('ok');
-    getMostUsedPlayers('s')
     res.send('🎵 POTEVO ESSERE UN TOSSICO MORTO E INVECE SONO UN TOSSICO RICCO!')
 })
+
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
 })
@@ -161,6 +161,7 @@ const sendPM = async (userID, PM) => {
     try {
         const user = await getUser(userID);
         const dmChannel = await user.createDM();
+        console.log(PM);
         const sent = await dmChannel.send(PM);
     } catch (error) {
         const handledError = handleDefaultDiscordError(error)
